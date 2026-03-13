@@ -1,0 +1,62 @@
+import json
+import os
+
+def load_json_safe(path):
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        return json.load(f)
+
+def load_signals():
+    raw = load_json_safe("data/processed/signal_snapshot.json")
+    signals = raw.get("signals", [])
+    signals_dict = {s["name"]: s["score"] for s in signals}
+    return {"signals": signals_dict}
+
+def load_regime():
+    raw = load_json_safe("macro_regime/regime_snapshot.json")
+    regimes = raw.get("regimes", [])
+    active_regime = ", ".join(regimes).replace("_", " ").title() if regimes else "Unknown"
+    
+    # Build history timeline
+    history = []
+    hist_dir = "data/history/regimes"
+    if os.path.exists(hist_dir):
+        for fname in sorted(os.listdir(hist_dir)):
+            if fname.startswith("regime_snapshot_") and fname.endswith(".json"):
+                 date_str = fname.replace("regime_snapshot_", "").replace(".json", "")
+                 hist_data = load_json_safe(os.path.join(hist_dir, fname))
+                 if hist_data and "regimes" in hist_data:
+                     rgs = hist_data.get("regimes", [])
+                     reg_name = rgs[0].replace("_", " ").title() if rgs else "Unknown" # taking first for simplicity in timeline
+                     history.append({"date": date_str.replace("_", "-"), "regime": reg_name})
+    
+    return {"active_regime": active_regime, "history": history}
+
+def load_portfolio():
+    raw = load_json_safe("portfolio_model.json")
+    weights = {}
+    for engine in raw.get("engines", []):
+         weights[engine["name"]] = engine["allocation_pct"]
+    cash = float(raw.get("cash_pct", 0))
+    if cash > 0:
+         weights["Cash"] = cash
+    return {"weights": weights}
+
+def load_alerts():
+    raw = load_json_safe("data/processed/alerts.json")
+    out_alerts = []
+    for a in raw.get("alerts", []):
+         lvl = a.get("level", "WARNING")
+         severity = "high" if lvl == "CRITICAL" else "medium"
+         out_alerts.append({"severity": severity, "message": a.get("message", "")})
+    return {"alerts": out_alerts}
+
+def load_governance():
+    raw = load_json_safe("decision_graph.json")
+    passed = False
+    for node in raw.get("nodes", []):
+        if node.get("node_type") == "governance_node":
+            if node.get("metadata", {}).get("passed", False):
+                passed = True
+    return {"status": "passed" if passed else "failed"}

@@ -53,6 +53,11 @@ def replay_pipeline(date: str, strategy: str = None):
         print(f"{engine.name}: {engine.allocation_pct:.0%}")
     print(f"Cash: {original_portfolio.cash_pct:.0%}")
 
+    res = {
+        "original": {e.name: e.allocation_pct for e in original_portfolio.engines}
+    }
+    res["original"]["Cash"] = original_portfolio.cash_pct
+
     if strategy:
         print(f"\nAlternative Allocation ({strategy.upper()})")
         # Fake a macro regime to force the strategy
@@ -62,7 +67,13 @@ def replay_pipeline(date: str, strategy: str = None):
             print(f"{engine.name}: {engine.allocation_pct:.0%}")
         print(f"Cash: {alt_portfolio.cash_pct:.0%}")
         
+        res["alternative"] = {e.name: e.allocation_pct for e in alt_portfolio.engines}
+        res["alternative"]["Cash"] = alt_portfolio.cash_pct
+    else:
+        res["alternative"] = res["original"]
+        
     _log_replay(date, strategy)
+    return res
 
 def _log_replay(date: str, strategy: str):
     log_path = "replay/replay_log.json"
