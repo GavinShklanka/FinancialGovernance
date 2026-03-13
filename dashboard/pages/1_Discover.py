@@ -5,33 +5,79 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from app.ui.style import apply_lumin_css
-from app.ui.data_bridge import load_regime
+from app.ui.style import apply_global_styles, page_hero, section_divider, analyst_note, card_grid
+from app.ui.data_bridge import load_regime, load_signals
 
-st.set_page_config(page_title="Discover | Lumin Finance", layout="wide")
-apply_lumin_css()
+st.set_page_config(page_title="Discover | Lumin Finance", page_icon="◈", layout="wide")
+apply_global_styles()
 
-st.header("What is happening in the world right now?")
-st.markdown("<p class='explanation-text'>Global Macro Context</p>", unsafe_allow_html=True)
-st.divider()
+regime = load_regime()
+signals_data = load_signals().get("signals", [])
 
-regime_data = load_regime()
-current_regime = regime_data.get("active_regime", "Unknown")
+active = regime.get("active_regime", "Unknown")
 
-st.markdown("### ACTIVE MACRO REGIME")
-st.markdown(f"<div class='metric-value'>{current_regime}</div>", unsafe_allow_html=True)
-st.markdown("<br>", unsafe_allow_html=True)
+# Build signal chip list for the hero
+signal_chips = []
+for s in signals_data[:6]:
+    prefix = "▲" if s["score"] > 0 else "▼" if s["score"] < 0 else "●"
+    signal_chips.append(f"{prefix} {s['name']} ({s['score']:+.1f})")
 
-st.markdown("#### Why this regime is active:")
-rationale = regime_data.get("regime_rationale", {})
-if rationale:
-    for k, v in rationale.items():
-        st.markdown(f"• **{k.replace('_', ' ').title()}**: {v}")
+page_hero(
+    kicker="The World Right Now",
+    title=active,
+    subtitle="This is the macro regime currently detected by the Antigravity signal engine. The regime classification determines how capital is allocated across growth, infrastructure, and defensive strategies.",
+    chips=signal_chips if signal_chips else ["No active signals"],
+)
+
+section_divider("Why This Regime Is Active")
+
+# Rationale from regime_snapshot
+rationale = regime.get("rationale", {})
+if isinstance(rationale, dict) and rationale:
+    rationale_cards = []
+    for regime_name, reason in rationale.items():
+        rationale_cards.append({
+            "eyebrow": "Regime Driver",
+            "title": regime_name.replace("_", " ").title(),
+            "body": reason,
+            "icon": "◈",
+        })
+    card_grid(rationale_cards, columns=2)
 else:
-    # Fallback to the user's hardcoded example if no data to prove the concept works
-    st.markdown("""
-    • Semiconductor demand accelerating
-    • Hyperscaler AI capex increasing
-    • Cyber incidents rising
-    • Copper demand signaling infrastructure expansion
-    """)
+    # Fallback: build explanation from signal data
+    bullish = [s for s in signals_data if s["score"] > 0]
+    bearish = [s for s in signals_data if s["score"] < 0]
+
+    if bullish:
+        analyst_note(
+            "Expansion Signals",
+            " • ".join([f"{s['name']} ({s['score']:+.2f})" for s in bullish]),
+            tone="success",
+        )
+    if bearish:
+        analyst_note(
+            "Contraction Signals",
+            " • ".join([f"{s['name']} ({s['score']:+.2f})" for s in bearish]),
+            tone="danger",
+        )
+
+section_divider("Signal Drivers Summary")
+
+if signals_data:
+    driver_cards = []
+    for sig in signals_data:
+        tone_icon = "▲" if sig["score"] > 0 else "▼" if sig["score"] < 0 else "●"
+        driver_cards.append({
+            "eyebrow": f"Score: {sig['score']:+.2f}",
+            "title": f"{tone_icon} {sig['name']}",
+            "body": sig.get("explanation", "Signal explanation pending."),
+            "icon": "◎",
+        })
+    card_grid(driver_cards, columns=3)
+
+# Regime history timeline
+history = regime.get("history", [])
+if history:
+    section_divider("Regime Timeline")
+    for entry in history[-5:]:
+        st.markdown(f"**{entry['date']}** → {entry['regime']}")

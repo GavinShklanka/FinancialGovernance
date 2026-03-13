@@ -5,63 +5,50 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from app.ui.style import apply_lumin_css
-
-st.set_page_config(page_title="Ecosystems | Lumin Finance", layout="wide")
-apply_lumin_css()
-
+from app.ui.style import apply_global_styles, page_hero, section_divider, analyst_note, card_grid
 from app.ui.data_bridge import load_market_data
 
-st.header("Which assets represent this macro environment?")
-st.markdown("<p class='explanation-text'>Authentic AI Ecosystem Data Mapping</p>", unsafe_allow_html=True)
-st.divider()
+st.set_page_config(page_title="Ecosystems | Lumin Finance", page_icon="◎", layout="wide")
+apply_global_styles()
 
 market_data = load_market_data()
 
-if not market_data:
-    st.warning("No market data found in the backend JSON cache. Run a pipeline cycle to fetch live data constraints.")
-else:
-    # We only have raw indices right now via market_snapshot, so we map the available intelligence
-    # rather than hallucinating fundamental metrics.
-    
-    st.markdown("### Core Macro Barometers")
-    colA, colB, colC = st.columns(3)
-    
-    spy = market_data.get("equities", {}).get("SPY", {}).get("price", "N/A")
-    vix = market_data.get("macro", {}).get("VIX", {}).get("value", "N/A")
-    gold = market_data.get("macro", {}).get("Gold", {}).get("price", "N/A")
-    btc = market_data.get("crypto", {}).get("BTC", {}).get("price", "N/A")
-    
-    with colA:
-        st.markdown("#### Broad Equity (SPY)")
-        if isinstance(spy, (int, float)):
-             st.markdown(f"<div class='metric-value'>${spy:,.2f}</div>", unsafe_allow_html=True)
-        else:
-             st.markdown(f"<div class='metric-value'>No Price</div>", unsafe_allow_html=True)
-        st.markdown("Role: Baseline risk appetite across sectors.")
-        
-    with colB:
-        st.markdown("#### Systemic Volatility (VIX)")
-        if isinstance(vix, (int, float)):
-             st.markdown(f"<div class='metric-value'>{vix:.2f}</div>", unsafe_allow_html=True)
-        else:
-             st.markdown(f"<div class='metric-value'>No Value</div>", unsafe_allow_html=True)
-        st.markdown("Role: Inverse indicator for growth/infrastructure positioning.")
-        
-    with colC:
-        st.markdown("#### Safe Haven / Alternatives")
-        st.markdown(f"**Gold:** ${gold:,.2f}" if isinstance(gold, (int, float)) else "**Gold:** N/A")
-        st.markdown(f"**Bitcoin:** ${btc:,.2f}" if isinstance(btc, (int, float)) else "**Bitcoin:** N/A")
-        st.markdown("Role: Defends portfolios against liquidity expansion or regime shocks.")
+page_hero(
+    kicker="AI Ecosystem Mapping",
+    title="Which assets represent this macro environment?",
+    subtitle="Macro signals are mapped to specific industries and companies within the AI infrastructure supply chain. Each asset is scored by its role in the current cycle and its primary structural risk.",
+    chips=["Semiconductors", "Hyperscalers", "Infrastructure", "Defense"],
+)
 
-    st.divider()
-    st.markdown("### AI Ecosystem Watchlist")
-    
+if not market_data:
+    st.warning("No market data found. Run a pipeline cycle to fetch live data.")
+else:
+    section_divider("Core Macro Barometers")
+
+    spy = market_data.get("macro", {}).get("SPY", {}).get("price", market_data.get("spy_price", "N/A"))
+    vix = market_data.get("macro", {}).get("VIX", {}).get("value", market_data.get("vix", "N/A"))
+    gold = market_data.get("macro", {}).get("Gold", {}).get("price", market_data.get("gold_price", "N/A"))
+    btc = market_data.get("crypto", {}).get("BTC", {}).get("price", market_data.get("btc_price", "N/A"))
+
+    barometer_cards = []
+    if isinstance(spy, (int, float)):
+        barometer_cards.append({"eyebrow": "Broad Equity", "title": f"SPY ${spy:,.2f}", "body": "Baseline risk appetite across sectors.", "icon": "📈"})
+    if isinstance(vix, (int, float)):
+        barometer_cards.append({"eyebrow": "Systemic Volatility", "title": f"VIX {vix:.2f}", "body": "Inverse indicator for growth/infrastructure positioning.", "icon": "📉"})
+    if isinstance(gold, (int, float)):
+        barometer_cards.append({"eyebrow": "Safe Haven", "title": f"Gold ${gold:,.2f}", "body": "Defends portfolios against liquidity expansion or regime shocks.", "icon": "🥇"})
+    if isinstance(btc, (int, float)):
+        barometer_cards.append({"eyebrow": "Digital Asset", "title": f"BTC ${btc:,.2f}", "body": "High-beta liquidity sponge and risk-on/off barometer.", "icon": "₿"})
+
+    if barometer_cards:
+        card_grid(barometer_cards, columns=4)
+
+    section_divider("AI Ecosystem Watchlist")
+
     equities = market_data.get("equities", {})
     if not equities:
         st.info("No AI equities retrieved. Run backend fetch cycle.")
     else:
-        # Hardcode definitions so the UI can remain completely data-driven on pricing but native on explanations
         roles = {
             "NVDA": {"role": "Dominant AI training compute infrastructure", "risk": "High valuation, concentrated capex reliance"},
             "AMD": {"role": "Primary alternative AI compute provider", "risk": "Software moat deficit vs CUDA"},
@@ -70,20 +57,19 @@ else:
             "MSFT": {"role": "Hyperscale cloud platform & enterprise AI", "risk": "Capex intensity dragging margins"},
             "AMZN": {"role": "AWS hyperscale cloud & custom silicon", "risk": "Consumer retail cycle exposure"},
             "GOOGL": {"role": "GCP hyperscaler & TPUs", "risk": "Search disruption from LLMs"},
-            "META": {"role": "Open source AI models & hyper-engaged network", "risk": "Regulatory headwinds, ad cycle"}
+            "META": {"role": "Open source AI models & hyper-engaged network", "risk": "Regulatory headwinds, ad cycle"},
         }
 
-        col1, col2 = st.columns(2)
-        idx = 0
+        equity_cards = []
         for ticker, info in roles.items():
             price_data = equities.get(ticker, {}).get("price", "N/A")
             price_str = f"${price_data:,.2f}" if isinstance(price_data, (int, float)) else "N/A"
-            
-            target_col = col1 if idx % 2 == 0 else col2
-            with target_col:
-                st.markdown(f"#### {ticker}")
-                st.markdown(f"**Current Price:** <span style='color: #38BDF8; font-weight:bold;'>{price_str}</span>", unsafe_allow_html=True)
-                st.markdown(f"**Ecosystem Role:** {info['role']}")
-                st.markdown(f"**Primary Risk:** {info['risk']}")
-                st.markdown("<br>", unsafe_allow_html=True)
-            idx += 1
+            equity_cards.append({
+                "eyebrow": f"{ticker} · {price_str}",
+                "title": info["role"],
+                "body": f"Primary Risk: {info['risk']}",
+                "footer": f"Live price from backend snapshot",
+                "icon": "◈",
+            })
+
+        card_grid(equity_cards, columns=4)

@@ -5,32 +5,40 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from app.ui.style import apply_lumin_css
+from app.ui.style import apply_global_styles, page_hero, section_divider, analyst_note, card_grid
 from app.ui.data_bridge import load_signals
 
-st.set_page_config(page_title="Signals | Lumin Finance", layout="wide")
-apply_lumin_css()
-
-st.header("What evidence is driving this conclusion?")
-st.markdown("<p class='explanation-text'>Signal Intelligence Panel</p>", unsafe_allow_html=True)
-st.divider()
+st.set_page_config(page_title="Signals | Lumin Finance", page_icon="◎", layout="wide")
+apply_global_styles()
 
 signals_data = load_signals().get("signals", [])
 
+total_score = sum(s["score"] for s in signals_data) if signals_data else 0
+bullish_count = sum(1 for s in signals_data if s["score"] > 0)
+bearish_count = sum(1 for s in signals_data if s["score"] < 0)
+
+page_hero(
+    kicker="Evidence Layer",
+    title="Signal Intelligence",
+    subtitle="Each signal below represents a measurable macro variable scored by the Antigravity engine. Positive scores indicate expansion. Negative scores indicate contraction. Every signal includes an analyst-grade explanation of its economic meaning.",
+    chips=[f"Total: {total_score:+.2f}", f"▲ {bullish_count} Bullish", f"▼ {bearish_count} Bearish"],
+)
+
+section_divider("Active Signals")
+
 if not signals_data:
-    st.info("No signal data available.")
+    st.info("No signal data available. Run the pipeline.")
 else:
     for sig in signals_data:
-        score_color = "#22C55E" if sig['score'] > 0 else "#EF4444" if sig['score'] < 0 else "#F59E0B"
+        tone = "success" if sig["score"] > 0 else "danger" if sig["score"] < 0 else "warning"
+        prefix = "▲" if sig["score"] > 0 else "▼" if sig["score"] < 0 else "●"
         
-        st.markdown(f"### {sig['name']}")
-        st.markdown(f"**Signal Strength:** <span style='color:{score_color}; font-weight:bold; font-size:18px;'>{sig['score']:+.2f}</span>", unsafe_allow_html=True)
-        
-        st.markdown("#### Analyst Note")
-        exp = sig.get('explanation')
-        if exp:
-            st.markdown(f"<div style='background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38BDF8; padding: 15px; border-radius: 0 8px 8px 0; font-size:16px;'>{exp}</div>", unsafe_allow_html=True)
-        else:
-            st.markdown(f"<div style='background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38BDF8; padding: 15px; border-radius: 0 8px 8px 0; font-size:16px;'>Historically predictable patterns suggest expansion parameters or critical contraction markers based on real-time data flow.</div>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.divider()
+        exp = sig.get("explanation", "")
+        if not exp:
+            exp = "Historically predictable patterns suggest expansion parameters or critical contraction markers based on real-time data flow."
+
+        analyst_note(
+            f"{prefix} {sig['name']} — Score: {sig['score']:+.2f}",
+            exp,
+            tone=tone,
+        )
