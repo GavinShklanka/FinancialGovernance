@@ -21,13 +21,16 @@ build/
 venv/
 env/
 
-# Data outputs (optional — you may want to track these)
-# data/raw/
-# data/processed/
-# macro_regime/
-# portfolio_model.json
-# decision_graph.json
-# app/outputs/
+# Data outputs (never track raw or processed state)
+data/raw/
+data/processed/
+cache/
+
+# Do not track pipeline final outputs
+macro_regime/
+portfolio_model.json
+decision_graph.json
+app/outputs/
 
 # IDE
 .vscode/
