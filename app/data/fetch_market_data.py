@@ -54,6 +54,25 @@ _SAMPLE_SNAPSHOT = {
     "cyber_incidents":           62.0,
     "china_pmi":                 50.8,
     "electricity_demand_signal": 4.1,
+    "equities": {
+        "NVDA": {"price": 850.0},
+        "AMD": {"price": 180.0},
+        "TSM": {"price": 140.0},
+        "ASML": {"price": 950.0},
+        "MSFT": {"price": 420.0},
+        "AMZN": {"price": 175.0},
+        "GOOGL": {"price": 145.0},
+        "META": {"price": 500.0}
+    },
+    "macro": {
+        "SPY": {"price": 512.34},
+        "VIX": {"value": 18.7},
+        "DXY": {"value": 104.25},
+        "Gold": {"price": 2185.50}
+    },
+    "crypto": {
+        "BTC": {"price": 71250.00}
+    }
 }
 
 
@@ -163,11 +182,33 @@ def fetch_and_store_market_snapshot() -> None:
         )
         if val:
             snapshot["spy_price"] = val
+            snapshot.setdefault("macro", {})["SPY"] = {"price": val}
             print(f"    ✓ SPY: ${val:,.2f} (live/cached)")
         else:
             print(f"    ~ SPY: ${snapshot['spy_price']:,.2f} (sample fallback)")
     else:
         print(f"    ~ SPY: ${snapshot['spy_price']:,.2f} (no ALPHAVANTAGE_API_KEY)")
+
+    # ── AI Equities ──
+    ai_tickers = ["NVDA", "AMD", "TSM", "ASML", "MSFT", "AMZN", "GOOGL", "META"]
+    snapshot.setdefault("equities", {})
+    for ticker in ai_tickers:
+        if av_key:
+            val = cached_fetch(
+                f"alphavantage_{ticker.lower()}",
+                lambda t=ticker: _fetch_alphavantage_price(t, av_key),
+                ttl_seconds=3600
+            )
+            if val is not None:
+                snapshot["equities"][ticker] = {"price": val}
+                print(f"    ✓ {ticker}: ${val:,.2f} (live/cached)")
+            else:
+                price = _SAMPLE_SNAPSHOT["equities"][ticker]["price"]
+                snapshot["equities"][ticker] = {"price": price}
+                print(f"    ~ {ticker}: ${price:,.2f} (sample fallback)")
+        else:
+            price = _SAMPLE_SNAPSHOT["equities"][ticker]["price"]
+            snapshot["equities"][ticker] = {"price": price}
 
     # ── Gold price ──
     if av_key:
@@ -178,6 +219,7 @@ def fetch_and_store_market_snapshot() -> None:
         )
         if val:
             snapshot["gold_price"] = val * 9.3  # GLD ≈ 1/10 oz; scale to spot approx
+            snapshot.setdefault("macro", {})["Gold"] = {"price": snapshot["gold_price"]}
             print(f"    ✓ Gold: ${snapshot['gold_price']:,.2f} (live/cached GLD proxy)")
 
     # ── 10Y Yield — FRED series DGS10 ──

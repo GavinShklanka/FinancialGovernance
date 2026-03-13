@@ -55,5 +55,35 @@ else:
         st.markdown("Role: Defends portfolios against liquidity expansion or regime shocks.")
 
     st.divider()
-    st.markdown("### Specific AI Company Metrics")
-    st.info("The fundamental backend processor is currently restricted to broad macro scopes. Company-level intelligence (growth Moats, specific revenues) requires an expansion of the Antigravity Alpha Vantage connector to stock-specific tickers.")
+    st.markdown("### AI Ecosystem Watchlist")
+    
+    equities = market_data.get("equities", {})
+    if not equities:
+        st.info("No AI equities retrieved. Run backend fetch cycle.")
+    else:
+        # Hardcode definitions so the UI can remain completely data-driven on pricing but native on explanations
+        roles = {
+            "NVDA": {"role": "Dominant AI training compute infrastructure", "risk": "High valuation, concentrated capex reliance"},
+            "AMD": {"role": "Primary alternative AI compute provider", "risk": "Software moat deficit vs CUDA"},
+            "TSM": {"role": "Monopoly fabrication layer for advanced silicon", "risk": "Geopolitical vulnerability"},
+            "ASML": {"role": "Monopoly EUV lithography system provider", "risk": "Export restrictions on advanced nodes"},
+            "MSFT": {"role": "Hyperscale cloud platform & enterprise AI", "risk": "Capex intensity dragging margins"},
+            "AMZN": {"role": "AWS hyperscale cloud & custom silicon", "risk": "Consumer retail cycle exposure"},
+            "GOOGL": {"role": "GCP hyperscaler & TPUs", "risk": "Search disruption from LLMs"},
+            "META": {"role": "Open source AI models & hyper-engaged network", "risk": "Regulatory headwinds, ad cycle"}
+        }
+
+        col1, col2 = st.columns(2)
+        idx = 0
+        for ticker, info in roles.items():
+            price_data = equities.get(ticker, {}).get("price", "N/A")
+            price_str = f"${price_data:,.2f}" if isinstance(price_data, (int, float)) else "N/A"
+            
+            target_col = col1 if idx % 2 == 0 else col2
+            with target_col:
+                st.markdown(f"#### {ticker}")
+                st.markdown(f"**Current Price:** <span style='color: #38BDF8; font-weight:bold;'>{price_str}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Ecosystem Role:** {info['role']}")
+                st.markdown(f"**Primary Risk:** {info['risk']}")
+                st.markdown("<br>", unsafe_allow_html=True)
+            idx += 1

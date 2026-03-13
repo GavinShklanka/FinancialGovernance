@@ -31,6 +31,9 @@ class MarketSnapshot:
     cyber_incidents: float = 0.0          # Weekly incident count (public sources)
     china_pmi: float = 0.0                # China official manufacturing PMI
     electricity_demand_signal: float = 0.0 # US electricity demand growth % YoY
+    equities: Dict[str, Dict[str, float | str]] = field(default_factory=dict)
+    macro: Dict[str, Dict[str, float | str]] = field(default_factory=dict)
+    crypto: Dict[str, Dict[str, float | str]] = field(default_factory=dict)
 
 
 # ── Stage 2 ─────────────────────────────────────────────────────────────────
