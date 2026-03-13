@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-03-13T19:58:00.880612+00:00",
+  "timestamp": "2026-03-13T21:18:09.027126+00:00",
   "total_score": 4.7,
   "market_data": {
-    "spy_price": 666.06,
+    "spy_price": 662.36,
     "vix": 27.29,
     "dxy": 119.491,
-    "tnx_yield": 4.21,
-    "gold_price": 4341.984,
+    "tnx_yield": 4.27,
+    "gold_price": 2185.5,
     "btc_price": 71250.0,
     "copper_inventories": 185.0,
     "uranium_spot": 95.5,
@@ -33,17 +33,17 @@
     },
     {
       "name": "10Y Yield",
-      "value": 4.21,
+      "value": 4.27,
       "score": 0.0,
       "weight": 1.2,
-      "explanation": "10Y yield 4.21% \u2014 neutral range."
+      "explanation": "10Y yield 4.27% \u2014 neutral range."
     },
     {
       "name": "Gold Momentum",
-      "value": 4341.984,
+      "value": 2185.5,
       "score": -0.5,
       "weight": 0.8,
-      "explanation": "Gold $4,342 \u2014 elevated, signalling defensive demand."
+      "explanation": "Gold $2,186 \u2014 elevated, signalling defensive demand."
     },
     {
       "name": "BTC Momentum",
