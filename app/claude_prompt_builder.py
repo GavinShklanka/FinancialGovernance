@@ -56,105 +56,64 @@ def _format_violations(gov: GovernanceResult) -> str:
 
 MASTER_PROMPT_TEMPLATE = """\
 ================================================================================
-ANTIGRAVITY — CLAUDE RESEARCH BRIEFING REQUEST
+LUMIN FINANCE RESEARCH PROMPT
 Generated: {timestamp}
 ================================================================================
 
-You are acting as a senior macro investment research analyst.
+You are a macro financial strategist analyzing the AI Supercycle.
 
-Below is this week's full Antigravity pipeline output. Your task is to:
-  1. Evaluate the macro regime and signal data
-  2. Critique the portfolio recommendation
-  3. Identify the 2–3 highest-conviction investment themes
-  4. Flag any risks or contradictions in the signal picture
-  5. Provide 1–2 historical analogues for the current regime
-  6. Give a brief recommendation: Hold / Rebalance / Increase / Reduce exposure
+Your task is to interpret the Antigravity signal system and provide a clear investment thesis.
 
-Be direct, concise, and institution-grade in your analysis.
+The system provides:
+1. Macro Signals
+2. Regime Detection
+3. Portfolio Allocation
+4. Risk Alerts
+5. Regime Forecast
+
+Your job is to:
+1. Explain the current macro regime.
+2. Interpret the signals driving the regime.
+3. Evaluate the recommended portfolio allocation.
+4. Identify macro risks.
+5. Forecast potential regime transitions.
+6. Recommend how a young investor should position capital during the AI Supercycle.
+
+Important:
+- Explain the reasoning clearly so the user learns how macro signals translate into investment strategy.
+- Avoid short-term trading advice.
+- Focus on structural trends including: AI infrastructure, semiconductors, energy demand, cybersecurity, cloud computing, defense technology, and industrial electrification.
+- Use the signals provided by the Antigravity system as anchors.
+- Explain: Why these signals matter. How long the regime could persist. What conditions would invalidate the thesis.
 
 ────────────────────────────────────────────────────────────────────────────────
-SECTION 1 — MACRO SIGNAL SNAPSHOT
+SYSTEM DATA SNAPSHOT
 ────────────────────────────────────────────────────────────────────────────────
 
-Timestamp   : {timestamp}
-Total Score : {total_score:+.2f}  (scale: heavily weighted sum; >5 = strong bull, <-5 = strong bear)
-
-Core Market Data:
-  SPY:       ${spy_price:,.2f}
-  VIX:       {vix}
-  DXY:       {dxy}
-  10Y Yield: {tnx_yield}%
-  Gold:      ${gold_price:,.2f}
-  BTC:       ${btc_price:,.0f}
-
-Extended Signals:
-  Copper Inventories:       {copper_inventories} kt
-  Uranium Spot:             ${uranium_spot}/lb
-  SEMI Equipment Orders:    +{semi_equipment_orders}% YoY
-  Hyperscaler Capex Signal: {hyperscaler_capex_signal}/10
-  Cyber Incidents (weekly): {cyber_incidents:.0f}
-  China PMI:                {china_pmi}
-  Electricity Demand:       +{electricity_demand_signal}% YoY
-
-Signal Scores:
+1. MACRO SIGNALS (Total Score: {total_score:+.2f})
 {signal_lines}
 
-────────────────────────────────────────────────────────────────────────────────
-SECTION 2 — MACRO REGIME CLASSIFICATION
-────────────────────────────────────────────────────────────────────────────────
-
+2. REGIME DETECTION
 Active Regimes: {regimes}
-
-Regime Analysis:
+Rationale:
 {regime_rationale}
 
-────────────────────────────────────────────────────────────────────────────────
-SECTION 3 — PORTFOLIO RECOMMENDATION (Three-Engine Model)
-────────────────────────────────────────────────────────────────────────────────
-
+3. PORTFOLIO ALLOCATION (Three-Engine Model)
 Stance: {stance}
-
 {engine_breakdown}
+Rationale: {portfolio_rationale}
 
-Portfolio Rationale: {portfolio_rationale}
-
-────────────────────────────────────────────────────────────────────────────────
-SECTION 4 — GOVERNANCE & RISK FLAGS
-────────────────────────────────────────────────────────────────────────────────
-
-Governance Status: {gov_status}
-
+4. RISK ALERTS & GOVERNANCE
+Governance: {gov_status}
 {governance_detail}
 
 ────────────────────────────────────────────────────────────────────────────────
 YOUR ANALYSIS (Claude)
 ────────────────────────────────────────────────────────────────────────────────
-
-Please structure your response as follows:
-
-**1. Macro Regime Assessment**
-[Your read on the regime — agree / disagree with classification?]
-
-**2. Signal Strength Evaluation**
-[Which signals are most reliable? Which are contradictory?]
-
-**3. Portfolio Critique**
-[Does the three-engine allocation make sense? What would you change?]
-
-**4. Top 2–3 Investment Themes**
-[Specific, actionable thematic ideas based on this regime]
-
-**5. Key Risks**
-[What could break this thesis?]
-
-**6. Historical Analogues**
-[What past macro environment does this resemble?]
-
-**7. Recommendation**
-[Hold / Rebalance / Increase / Reduce — which specific engines and why]
+Please structure your response based on the 6 key jobs above, ensuring an educational narrative journey.
 
 ================================================================================
-END OF ANTIGRAVITY BRIEFING
+END OF LUMIN FINANCE BRIEFING
 ================================================================================
 """
 

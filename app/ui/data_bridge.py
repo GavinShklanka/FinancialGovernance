@@ -10,14 +10,15 @@ def load_json_safe(path):
 def load_signals():
     raw = load_json_safe("data/processed/signal_snapshot.json")
     signals = raw.get("signals", [])
-    signals_dict = {s["name"]: s["score"] for s in signals}
-    return {"signals": signals_dict}
+    # Return full objects to support tooltip explanations
+    signals_list = [{"name": s["name"], "score": s["score"], "explanation": s.get("explanation", "")} for s in signals]
+    return {"signals": signals_list}
 
 def load_regime():
     raw = load_json_safe("macro_regime/regime_snapshot.json")
     regimes = raw.get("regimes", [])
     active_regime = ", ".join(regimes).replace("_", " ").title() if regimes else "Unknown"
-    
+    rationale = raw.get("regime_rationale", {})
     # Build history timeline
     history = []
     hist_dir = "data/history/regimes"
