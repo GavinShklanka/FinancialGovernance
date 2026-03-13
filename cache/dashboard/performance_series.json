@@ -1,0 +1,15 @@
+{
+  "timestamp": 1773430003.340589,
+  "payload": {
+    "timestamp": "2026-03-13 19:26:41",
+    "total_score": 4.7,
+    "stance": "bearish",
+    "cash_pct": 0.3,
+    "regimes": [
+      "ai_infrastructure_boom",
+      "commodity_supercycle",
+      "liquidity_contraction",
+      "defensive_regime"
+    ]
+  }
+}

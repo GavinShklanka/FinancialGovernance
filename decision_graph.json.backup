@@ -1,0 +1,61 @@
+{
+  "cycle_timestamp": "2026-03-13T14:21:50.221994+00:00",
+  "node_count": 5,
+  "nodes": [
+    {
+      "node_id": "30d92b8d-25cf-49bc-8527-7d32ed39bc19",
+      "node_type": "signal_node",
+      "description": "Signal scoring complete. Total weighted score: +4.70",
+      "timestamp": "2026-03-13T14:21:50.221466+00:00",
+      "parent_id": null,
+      "metadata": {
+        "total_score": 4.7
+      }
+    },
+    {
+      "node_id": "6196902a-1555-4271-8d19-299dc9019fba",
+      "node_type": "regime_node",
+      "description": "Macro regime(s) detected: ai_infrastructure_boom, commodity_supercycle, liquidity_contraction, defensive_regime",
+      "timestamp": "2026-03-13T14:21:50.221502+00:00",
+      "parent_id": "30d92b8d-25cf-49bc-8527-7d32ed39bc19",
+      "metadata": {
+        "regimes": [
+          "ai_infrastructure_boom",
+          "commodity_supercycle",
+          "liquidity_contraction",
+          "defensive_regime"
+        ]
+      }
+    },
+    {
+      "node_id": "a47a77cb-4411-459e-88cb-be7ce5cc4e8d",
+      "node_type": "portfolio_node",
+      "description": "Three-engine portfolio built. Stance: BEARISH",
+      "timestamp": "2026-03-13T14:21:50.221521+00:00",
+      "parent_id": "6196902a-1555-4271-8d19-299dc9019fba",
+      "metadata": {
+        "stance": "bearish"
+      }
+    },
+    {
+      "node_id": "668cce4f-bb61-4395-b7cb-7a17db72ce8d",
+      "node_type": "governance_node",
+      "description": "Governance check: PASSED",
+      "timestamp": "2026-03-13T14:21:50.221536+00:00",
+      "parent_id": "a47a77cb-4411-459e-88cb-be7ce5cc4e8d",
+      "metadata": {
+        "passed": true
+      }
+    },
+    {
+      "node_id": "37bcb81e-f20c-49f0-b934-75dd039f3cb5",
+      "node_type": "human_approval_node",
+      "description": "Awaiting human review. Claude briefing generated. Execution pending decision.",
+      "timestamp": "2026-03-13T14:21:50.221550+00:00",
+      "parent_id": "668cce4f-bb61-4395-b7cb-7a17db72ce8d",
+      "metadata": {
+        "claude_prompt": "app/outputs/claude_prompt.txt"
+      }
+    }
+  ]
+}
