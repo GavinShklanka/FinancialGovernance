@@ -36,13 +36,23 @@ def load_regime():
 
 def load_portfolio():
     raw = load_json_safe("portfolio_model.json")
-    weights = {}
+    engines = []
     for engine in raw.get("engines", []):
-         weights[engine["name"]] = engine["allocation_pct"]
-    cash = float(raw.get("cash_pct", 0))
-    if cash > 0:
-         weights["Cash"] = cash
-    return {"weights": weights}
+         engines.append({
+             "name": engine["name"],
+             "allocation_pct": engine["allocation_pct"],
+             "rationale": engine.get("rationale", "No rationale provided by model.")
+         })
+    
+    cash_pct = float(raw.get("cash_pct", 0))
+    overall_rationale = raw.get("rationale", "No overall rationale provided.")
+    
+    return {
+        "engines": engines,
+        "cash_pct": cash_pct,
+        "overall_rationale": overall_rationale,
+        "stance": raw.get("stance", "neutral")
+    }
 
 def load_alerts():
     raw = load_json_safe("data/processed/alerts.json")
@@ -53,11 +63,22 @@ def load_alerts():
          out_alerts.append({"severity": severity, "message": a.get("message", "")})
     return {"alerts": out_alerts}
 
+def load_market_data():
+    return load_json_safe("data/raw/market_snapshot.json")
+
 def load_governance():
     raw = load_json_safe("decision_graph.json")
     passed = False
+    violations = []
+    
     for node in raw.get("nodes", []):
         if node.get("node_type") == "governance_node":
-            if node.get("metadata", {}).get("passed", False):
-                passed = True
-    return {"status": "passed" if passed else "failed"}
+            meta = node.get("metadata", {})
+            passed = meta.get("passed", False)
+            violations = meta.get("violations", [])
+            break
+            
+    return {
+        "status": "passed" if passed else "failed",
+        "violations": violations
+    }

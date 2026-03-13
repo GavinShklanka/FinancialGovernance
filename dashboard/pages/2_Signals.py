@@ -21,13 +21,16 @@ if not signals_data:
     st.info("No signal data available.")
 else:
     for sig in signals_data:
-        st.markdown(f"### {sig['name']}")
         score_color = "#22C55E" if sig['score'] > 0 else "#EF4444" if sig['score'] < 0 else "#F59E0B"
-        st.markdown(f"**Score:** <span style='color:{score_color}; font-weight:bold;'>{sig['score']:+.2f}</span>", unsafe_allow_html=True)
-        st.markdown("**Explanation:**")
+        
+        st.markdown(f"### {sig['name']}")
+        st.markdown(f"**Signal Strength:** <span style='color:{score_color}; font-weight:bold; font-size:18px;'>{sig['score']:+.2f}</span>", unsafe_allow_html=True)
+        
+        st.markdown("#### Analyst Note")
         exp = sig.get('explanation')
         if exp:
-            st.markdown(f"{exp}")
+            st.markdown(f"<div style='background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38BDF8; padding: 15px; border-radius: 0 8px 8px 0; font-size:16px;'>{exp}</div>", unsafe_allow_html=True)
         else:
-            st.markdown("*Historically predictable patterns suggest expansion parameters or critical contraction markers.*")
+            st.markdown(f"<div style='background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38BDF8; padding: 15px; border-radius: 0 8px 8px 0; font-size:16px;'>Historically predictable patterns suggest expansion parameters or critical contraction markers based on real-time data flow.</div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         st.divider()

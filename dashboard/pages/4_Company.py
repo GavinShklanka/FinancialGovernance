@@ -14,25 +14,33 @@ st.header("Company Intelligence")
 st.markdown("<p class='explanation-text'>Evaluating specific assets in this macro context.</p>", unsafe_allow_html=True)
 st.divider()
 
-st.selectbox("Select Asset to Evaluate", ["NVIDIA (NVDA)", "TSMC (TSM)", "ASML (ASML)"])
+from app.ui.data_bridge import load_market_data
 
-st.markdown("### NVIDIA Investment Thesis")
-st.markdown("Dominant AI compute provider with strong pricing power and growing demand from hyperscaler AI infrastructure investment.")
+st.header("Company Intelligence")
+st.markdown("<p class='explanation-text'>Evaluating specific assets in this macro context.</p>", unsafe_allow_html=True)
+st.divider()
 
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown("#### Pros")
-    st.markdown("""
-    • 80%+ AI GPU market share  
-    • Hyperscaler capex expansion  
-    • High gross margins  
-    • AI training demand rising  
-    """)
+market = load_market_data()
 
-with col2:
-    st.markdown("#### Cons / Risks")
-    st.markdown("""
-    • High valuation  
-    • China export restrictions  
-    • Competition from custom silicon  
-    """)
+if not market:
+    st.warning("No backend market data available. Run the pipeline.")
+else:
+    # We only have a few top-level assets right now in the backend
+    available_assets = list(market.get("equities", {}).keys()) + list(market.get("macro", {}).keys()) + list(market.get("crypto", {}).keys())
+    
+    if available_assets:
+        selected = st.selectbox("Select Asset to Evaluate (Powered by live snapshot)", available_assets)
+        
+        st.markdown(f"### {selected} Snapshot")
+        
+        # Try to find the price
+        price = "N/A"
+        if selected in market.get("equities", {}): price = market["equities"][selected].get("price", "N/A")
+        elif selected in market.get("macro", {}): price = market["macro"][selected].get("price", market["macro"][selected].get("value", "N/A"))
+        elif selected in market.get("crypto", {}): price = market["crypto"][selected].get("price", "N/A")
+        
+        st.markdown(f"**Current Valuation / Index:** {price}")
+        st.markdown("---")
+        st.info(f"The `company_research` engine is currently disabled in the backend architecture. To view dynamic P/E ratios, Revenue YoY bounds, and fundamental Cons/Risks for `{selected}`, the Antigravity fundamental scraper must be integrated.")
+    else:
+        st.warning("No observable assets in the current snapshot.")

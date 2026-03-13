@@ -31,3 +31,18 @@ else:
             st.markdown(f"<p class='explanation-text'>Monitored signal variation could transition the environment away from the optimal positioning thesis.</p>", unsafe_allow_html=True)
         else:
             st.info(f"NOTICE: {msg}")
+
+st.divider()
+st.header("Governance & Compliance")
+st.markdown("<p class='explanation-text'>Checking algorithmic allocations against active risk boundaries.</p>", unsafe_allow_html=True)
+
+from app.ui.data_bridge import load_governance
+gov = load_governance()
+
+if gov.get("status") == "passed":
+    st.success("✓ GOVERNANCE CHECKS PASSED: Portfolio engine complies with all defined risk and position limits.")
+else:
+    st.error("⚠ GOVERNANCE CHECKS FAILED: Strategy allocation violates constraints.")
+    for violation in gov.get("violations", []):
+        st.markdown(f"**[{violation.get('severity', 'HIGH')}] {violation.get('rule', 'Unknown Rule')}**")
+        st.markdown(f"*{violation.get('detail', '')}*")
