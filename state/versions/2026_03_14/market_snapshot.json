@@ -9,18 +9,18 @@
   "uranium_spot": 95.5,
   "semi_equipment_orders": 18.5,
   "hyperscaler_capex_signal": 8.2,
-  "cyber_incidents": 75.0,
+  "cyber_incidents": 77.0,
   "china_pmi": 50.8,
   "electricity_demand_signal": 4.1,
   "equities": {
     "NVDA": {
-      "price": 850.0
+      "price": 180.25
     },
     "AMD": {
       "price": 180.0
     },
     "TSM": {
-      "price": 140.0
+      "price": 338.31
     },
     "ASML": {
       "price": 950.0
@@ -29,13 +29,13 @@
       "price": 420.0
     },
     "AMZN": {
-      "price": 175.0
+      "price": 207.67
     },
     "GOOGL": {
       "price": 145.0
     },
     "META": {
-      "price": 500.0
+      "price": 613.71
     }
   },
   "macro": {
@@ -57,5 +57,5 @@
       "price": 71250.0
     }
   },
-  "timestamp": "2026-03-14T05:52:47.759355+00:00"
+  "timestamp": "2026-03-14T15:52:49.960330+00:00"
 }

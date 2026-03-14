@@ -82,3 +82,11 @@ def load_governance():
         "status": "passed" if passed else "failed",
         "violations": violations
     }
+
+def load_portfolio_evaluation():
+    """Load the latest portfolio evaluation report."""
+    raw = load_json_safe("data/processed/reports/latest_portfolio_evaluation.json")
+    if not raw:
+        return None
+    return raw
+

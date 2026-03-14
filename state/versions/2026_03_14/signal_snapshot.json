@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-14T05:52:47.759355+00:00",
+  "timestamp": "2026-03-14T15:52:49.960330+00:00",
   "total_score": 4.7,
   "market_data": {
     "spy_price": 662.29,
@@ -12,7 +12,7 @@
     "uranium_spot": 95.5,
     "semi_equipment_orders": 18.5,
     "hyperscaler_capex_signal": 8.2,
-    "cyber_incidents": 75.0,
+    "cyber_incidents": 77.0,
     "china_pmi": 50.8,
     "electricity_demand_signal": 4.1
   },
@@ -82,10 +82,10 @@
     },
     {
       "name": "Cyber Incidents",
-      "value": 75.0,
+      "value": 77.0,
       "score": 1.0,
       "weight": 0.9,
-      "explanation": "75 cyber incidents/week \u2014 elevated threat environment, strong tailwind for cybersecurity sector."
+      "explanation": "77 cyber incidents/week \u2014 elevated threat environment, strong tailwind for cybersecurity sector."
     },
     {
       "name": "China PMI",

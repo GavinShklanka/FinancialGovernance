@@ -6,75 +6,124 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from app.ui.style import apply_global_styles, page_hero, section_divider, analyst_note, card_grid
-from app.ui.data_bridge import load_market_data
+from app.ui.data_bridge import load_signals, load_market_data, load_portfolio_evaluation
 
-st.set_page_config(page_title="Company | Lumin Finance", page_icon="◈", layout="wide")
+st.set_page_config(page_title="Company | Lumin Finance", page_icon="▲", layout="wide")
 apply_global_styles()
 
+market = load_market_data()
+eval_data = load_portfolio_evaluation()
+
+# ── Asset universe ───────────────────────────────────────────────────────────
+_ASSETS = {
+    "NVDA": {"name": "NVIDIA", "role": "AI training hardware monopoly", "sector": "Growth"},
+    "AMD": {"name": "AMD", "role": "AI inference & custom silicon", "sector": "Growth"},
+    "SMH": {"name": "VanEck Semiconductor ETF", "role": "Broad semi exposure", "sector": "Growth"},
+    "COPX": {"name": "Global X Copper Miners", "role": "Copper infrastructure play", "sector": "Infrastructure"},
+    "URNM": {"name": "Sprott Uranium Miners", "role": "Nuclear AI power thesis", "sector": "Infrastructure"},
+    "CIBR": {"name": "First Trust Cybersecurity", "role": "Cybersecurity defense floor", "sector": "Defense"},
+    "GLD": {"name": "SPDR Gold Trust", "role": "Safe-haven hedge", "sector": "Defense"},
+    "ITA": {"name": "iShares US Aerospace & Defense", "role": "Defense spending cycle", "sector": "Defense"},
+}
+
 page_hero(
-    kicker="Company Intelligence",
-    title="Analyst Research Desk",
-    subtitle="Select an asset to receive its macro thesis, strategic advantages, and structural risks. All pricing data is fetched from the backend pipeline snapshot.",
-    chips=["Thesis", "Advantages", "Risks"],
+    kicker="Analyst Research Desk",
+    title="What does the evidence say?",
+    subtitle="Select an asset to review its thesis, supporting signals, risk factors, and position recommendation.",
+    chips=[f"{len(_ASSETS)} Assets Tracked"],
 )
 
-market = load_market_data()
+# ── Asset selector ───────────────────────────────────────────────────────────
+selected = st.selectbox("Select Asset", list(_ASSETS.keys()), format_func=lambda t: f"{t} — {_ASSETS[t]['name']}")
+asset_info = _ASSETS[selected]
 
-if not market:
-    st.warning("No backend market data available. Run the pipeline.")
+# Find evaluation decision for this asset
+asset_decision = None
+if eval_data and eval_data.get("decisions"):
+    for d in eval_data["decisions"]:
+        if d["ticker"] == selected:
+            asset_decision = d
+            break
+
+# ── Tabbed Detail View ───────────────────────────────────────────────────────
+if asset_decision:
+    tab_decision, tab_thesis, tab_risk, tab_execution, tab_history = st.tabs([
+        "Decision", "Thesis", "Risk", "Execution", "History"
+    ])
+
+    with tab_decision:
+        section_divider(f"{selected} — Decision")
+        analyst_note(
+            f"{asset_decision['action']} · {asset_decision['conviction']} Conviction",
+            asset_decision.get("simple_summary", ""),
+            tone="success" if asset_decision["action"] in ("BUY_NOW", "SCALE_IN") else (
+                "danger" if asset_decision["action"] in ("TRIM", "EXIT") else "warning"
+            ),
+        )
+        card_grid([
+            {"eyebrow": "Engine", "title": asset_decision.get("engine", ""), "body": f"Target weight: {asset_decision.get('target_weight_pct', 0):.1%}", "icon": "◈"},
+            {"eyebrow": "Regime Alignment", "title": asset_decision.get("regime_alignment", ""), "body": "Current macro regime supports this position.", "icon": "⊕"},
+            {"eyebrow": "Timeframe", "title": asset_decision.get("timeframe", ""), "body": f"Entry: {asset_decision.get('entry_strategy', 'N/A')}", "icon": "⏱"},
+        ], columns=3)
+
+    with tab_thesis:
+        section_divider(f"{selected} — Macro Thesis")
+        analyst_note("Investment Thesis", asset_decision.get("thesis", "No thesis available."), tone="accent")
+        analyst_note("Strategic Advantage", asset_decision.get("advantage", "No advantage data."), tone="success")
+
+        if asset_decision.get("supporting_signals"):
+            section_divider("Supporting Signals")
+            signal_cards = [
+                {"eyebrow": "SIGNAL", "title": sig, "body": "", "icon": "▲"}
+                for sig in asset_decision["supporting_signals"]
+            ]
+            card_grid(signal_cards, columns=3)
+
+    with tab_risk:
+        section_divider(f"{selected} — Risk Assessment")
+        analyst_note("Primary Risk", asset_decision.get("primary_risk", "No risk data."), tone="danger")
+        analyst_note("Invalidation Trigger", asset_decision.get("invalidation_trigger", "No invalidation criteria."), tone="warning")
+        if asset_decision.get("max_drawdown_tolerance"):
+            analyst_note("Max Drawdown Tolerance", asset_decision["max_drawdown_tolerance"], tone="warning")
+
+    with tab_execution:
+        section_divider(f"{selected} — Execution Plan")
+        card_grid([
+            {"eyebrow": "Entry Strategy", "title": asset_decision.get("entry_strategy", ""), "body": f"Action: {asset_decision['action']}", "icon": "▶"},
+            {"eyebrow": "Exit Conditions", "title": asset_decision.get("exit_conditions", ""), "body": "", "icon": "■"},
+            {"eyebrow": "Position Size", "title": f"{asset_decision.get('target_weight_pct', 0):.1%}", "body": asset_decision.get("position_size_rationale", ""), "icon": "◎"},
+        ], columns=3)
+
+    with tab_history:
+        section_divider(f"{selected} — History")
+        analyst_note(
+            "Historical Context",
+            f"{selected} is positioned within the {asset_decision.get('engine', 'N/A')} engine. "
+            f"Regime alignment: {asset_decision.get('regime_alignment', 'N/A')}. "
+            f"Signal history tracking will be available as more pipeline runs accumulate.",
+            tone="accent",
+        )
+
 else:
-    available_assets = list(market.get("equities", {}).keys()) + list(market.get("macro", {}).keys()) + list(market.get("crypto", {}).keys())
+    # Fallback when no evaluation data exists
+    section_divider(f"{selected} — Overview")
+    analyst_note(
+        f"{asset_info['name']} ({selected})",
+        f"Role: {asset_info['role']}. Sector: {asset_info['sector']}. "
+        f"Run the pipeline to generate position recommendations.",
+        tone="accent",
+    )
 
-    if available_assets:
-        selected = st.selectbox("Select Asset to Evaluate", available_assets)
+    # Static advantage/risk cards
+    advantage_cards = [
+        {"eyebrow": "ROLE", "title": asset_info["role"], "body": f"Tracked within the {asset_info['sector']} engine.", "icon": "▲"},
+        {"eyebrow": "SECTOR", "title": asset_info["sector"], "body": "Engine allocation driven by macro regime.", "icon": "◈"},
+    ]
+    risk_cards = [
+        {"eyebrow": "RISK", "title": "General Market Risk", "body": "Macro regime changes can shift allocation away from this position.", "icon": "⚠"},
+    ]
 
-        # Find price
-        price = "N/A"
-        if selected in market.get("equities", {}):
-            price = market["equities"][selected].get("price", "N/A")
-        elif selected in market.get("macro", {}):
-            price = market["macro"][selected].get("price", market["macro"][selected].get("value", "N/A"))
-        elif selected in market.get("crypto", {}):
-            price = market["crypto"][selected].get("price", "N/A")
-
-        price_str = f"${price:,.2f}" if isinstance(price, (int, float)) else str(price)
-
-        section_divider(f"{selected} Analysis")
-
-        roles = {
-            "NVDA": {"thesis": "NVIDIA is the dominant provider of AI training hardware used by hyperscalers.", "pros": ["Dominant AI GPU market share", "Strong pricing power", "Hyperscaler demand expansion"], "cons": ["High valuation", "Geopolitical export risk", "Customer competition (custom silicon)"]},
-            "AMD": {"thesis": "AMD serves as the crucial secondary supplier to prevent NVDA monopoly.", "pros": ["Datacenter CPU dominance", "MI300 GPU adoption", "Open ROCm software push"], "cons": ["Lower gross margins", "Still catching up in AI software API"]},
-            "TSM": {"thesis": "TSMC is the irreplaceable choke point of global advanced semiconductor manufacturing.", "pros": ["Absolute fabrication monopoly", "Massive pricing power", "Benefiting from all fabless designers"], "cons": ["Taiwan geopolitical risk", "Intensive capital expenditure required"]},
-            "ASML": {"thesis": "ASML provides the foundational EUV machines required by TSM to build AI chips.", "pros": ["100% EUV monopoly", "Multi-year backlog", "Irreplaceable technology"], "cons": ["Extreme regulatory export bans", "Slowing trailing-node demand"]},
-            "MSFT": {"thesis": "Microsoft integrates OpenAI models directly into global enterprise workflows.", "pros": ["Azure AI growth", "Office 365 Copilot monetization", "Diversified revenue streams"], "cons": ["OpenAI dependency", "Massive required infrastructure capex"]},
-            "AMZN": {"thesis": "Amazon Web Services provides the cloud layer and custom silicon.", "pros": ["AWS cloud market leader", "Custom silicon cost advantages", "Strong cash flow"], "cons": ["Retail margin pressure", "Catching up in foundational LLMs"]},
-            "GOOGL": {"thesis": "Google holds the deepest internal AI R&D and proprietary TPUs.", "pros": ["TPU infrastructure scale", "DeepMind research lead", "Massive consumer data pool"], "cons": ["Search engine innovator's dilemma", "DOJ anti-trust scrutiny"]},
-            "META": {"thesis": "Meta dominates consumer attention and provides the leading open-source models.", "pros": ["Unmatched ad-targeting efficiency", "LLaMA defining open-source standards", "Leaner operating structure"], "cons": ["Reality Labs cash burn", "Regulatory risks"]},
-            "SPY": {"thesis": "The S&P 500 represents the broad baseline of American corporate capitalization.", "pros": ["Diversified risk", "Earnings growth baseline"], "cons": ["Concentration in top 7 tech stocks", "Vulnerable to rate hikes"]},
-            "VIX": {"thesis": "The Volatility Index prices the implied volatility of S&P 500 options.", "pros": ["Hedge against market crashes", "Mean-reverting asset"], "cons": ["High cost of carry", "Decays in calm markets"]},
-            "Gold": {"thesis": "Gold acts as a monetary alternative and defense against systemic debasement.", "pros": ["Zero counterparty risk", "Inflation hedge"], "cons": ["No yield generation", "Opportunity cost vs equities"]},
-            "BTC": {"thesis": "Bitcoin operates as a high-beta digital store of value and liquidity sponge.", "pros": ["Absolute scarcity", "Decentralized settlement", "High liquidity sensitivity"], "cons": ["Extreme volatility", "Regulatory uncertainty"]},
-            "DXY": {"thesis": "The Dollar Index measures USD strength against a basket of major currencies.", "pros": ["Global reserve currency status", "Flight-to-safety beneficiary"], "cons": ["Headwind for EM and commodities", "Inverse correlation with risk assets"]},
-        }
-
-        if selected in roles:
-            data = roles[selected]
-
-            analyst_note(
-                f"{selected} Macro Thesis — {price_str}",
-                data["thesis"],
-                tone="accent",
-            )
-
-            pros_cards = [{"eyebrow": "Advantage", "title": p, "body": "", "icon": "▲"} for p in data["pros"]]
-            cons_cards = [{"eyebrow": "Risk", "title": c, "body": "", "icon": "▼"} for c in data["cons"]]
-
-            section_divider("Strategic Advantages")
-            card_grid(pros_cards, columns=3)
-
-            section_divider("Structural Risks")
-            card_grid(cons_cards, columns=3)
-        else:
-            st.info("Detailed analyst briefing unavailable for this specific tracker.")
-    else:
-        st.warning("No observable assets in the current snapshot.")
+    section_divider("Strategic Advantages")
+    card_grid(advantage_cards, columns=2)
+    section_divider("Structural Risks")
+    card_grid(risk_cards, columns=2)

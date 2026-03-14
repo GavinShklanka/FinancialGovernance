@@ -1,23 +1,23 @@
 {
-  "cycle_timestamp": "2026-03-13T23:15:01.379954+00:00",
+  "cycle_timestamp": "2026-03-14T15:17:21.923132+00:00",
   "node_count": 5,
   "nodes": [
     {
-      "node_id": "99928dcf-2ace-4026-903d-00ed3f2e0491",
+      "node_id": "4eb28b97-544a-4836-aa5c-629f86b20238",
       "node_type": "signal_node",
       "description": "Signal scoring complete. Total weighted score: +4.70",
-      "timestamp": "2026-03-13T23:15:01.379524+00:00",
+      "timestamp": "2026-03-14T15:17:21.922496+00:00",
       "parent_id": null,
       "metadata": {
         "total_score": 4.7
       }
     },
     {
-      "node_id": "47e4be4c-9be4-4f7d-ba3c-945e7c3685ee",
+      "node_id": "b1174ed8-b342-4fa4-aca2-823d480fbd13",
       "node_type": "regime_node",
       "description": "Macro regime(s) detected: ai_infrastructure_boom, commodity_supercycle, liquidity_contraction, defensive_regime",
-      "timestamp": "2026-03-13T23:15:01.379558+00:00",
-      "parent_id": "99928dcf-2ace-4026-903d-00ed3f2e0491",
+      "timestamp": "2026-03-14T15:17:21.922540+00:00",
+      "parent_id": "4eb28b97-544a-4836-aa5c-629f86b20238",
       "metadata": {
         "regimes": [
           "ai_infrastructure_boom",
@@ -28,31 +28,31 @@
       }
     },
     {
-      "node_id": "d8806212-7c23-46ef-94d5-83b1a7f655d2",
+      "node_id": "2270be32-60ed-4d5a-9d73-f32639b92fac",
       "node_type": "portfolio_node",
       "description": "Three-engine portfolio built. Stance: BEARISH",
-      "timestamp": "2026-03-13T23:15:01.379575+00:00",
-      "parent_id": "47e4be4c-9be4-4f7d-ba3c-945e7c3685ee",
+      "timestamp": "2026-03-14T15:17:21.922558+00:00",
+      "parent_id": "b1174ed8-b342-4fa4-aca2-823d480fbd13",
       "metadata": {
         "stance": "bearish"
       }
     },
     {
-      "node_id": "72c7a9e0-975f-4c48-98d0-5c8137c47fe2",
+      "node_id": "991832ad-0077-4ebc-aab7-3ae96e10bc57",
       "node_type": "governance_node",
       "description": "Governance check: PASSED",
-      "timestamp": "2026-03-13T23:15:01.379587+00:00",
-      "parent_id": "d8806212-7c23-46ef-94d5-83b1a7f655d2",
+      "timestamp": "2026-03-14T15:17:21.922572+00:00",
+      "parent_id": "2270be32-60ed-4d5a-9d73-f32639b92fac",
       "metadata": {
         "passed": true
       }
     },
     {
-      "node_id": "42f971d1-b138-4236-9a76-14c6157e7307",
+      "node_id": "a1394d0f-927d-42cb-b940-c8fb0041f288",
       "node_type": "human_approval_node",
       "description": "Awaiting human review. Claude briefing generated. Execution pending decision.",
-      "timestamp": "2026-03-13T23:15:01.379598+00:00",
-      "parent_id": "72c7a9e0-975f-4c48-98d0-5c8137c47fe2",
+      "timestamp": "2026-03-14T15:17:21.922583+00:00",
+      "parent_id": "991832ad-0077-4ebc-aab7-3ae96e10bc57",
       "metadata": {
         "claude_prompt": "app/outputs/claude_prompt.txt"
       }

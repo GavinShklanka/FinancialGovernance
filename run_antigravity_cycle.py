@@ -49,6 +49,9 @@ from app.alerts.alert_engine import generate_alerts
 from app.data.cache_engine import save_cache
 from app.data.loaders import load_json
 
+from app.reporting.portfolio_evaluator import evaluate_portfolio
+from app.reporting.exporters import export_json as export_eval_json, export_markdown as export_eval_md
+
 from system_integrity.recovery_manager import restore_backup
 from system_integrity.state_manager import create_state_snapshot
 from decision_graph.decision_graph_builder import DecisionGraphBuilder, GraphStore
@@ -135,6 +138,13 @@ def run_antigravity_cycle() -> None:
     else:
         print(f"  ⚠  {len(governance.violations)} violation(s) detected — review before execution.")
 
+    # ── Stage 5.5: Portfolio Evaluation Report ────────────────────
+    _banner("Stage 5.5 — Portfolio Evaluation Report")
+    eval_report = evaluate_portfolio(signal_snapshot, macro_regime, portfolio, governance)
+    export_eval_json(eval_report)
+    export_eval_md(eval_report)
+    _done(f"Evaluation: {eval_report.simple_summary}")
+
     # ── Stage 6: Decision Graph ──────────────────────────────────
     _banner("Stage 6 — Decision Graph Recording")
     nodes = DecisionGraphBuilder.build_cycle_graph(
@@ -206,6 +216,8 @@ def run_antigravity_cycle() -> None:
     print("    decision_graph.json")
     print("    app/outputs/claude_prompt.txt")
     print("    app/outputs/weekly_report.md")
+    print("    data/processed/reports/latest_portfolio_evaluation.json")
+    print("    data/processed/reports/latest_portfolio_evaluation.md")
     print()
     print("  Next step: open app/outputs/claude_prompt.txt → paste into Claude.")
     print()
