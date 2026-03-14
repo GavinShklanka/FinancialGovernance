@@ -1,0 +1,61 @@
+{
+  "spy_price": 662.29,
+  "vix": 27.29,
+  "dxy": 119.491,
+  "tnx_yield": 4.27,
+  "gold_price": 2185.5,
+  "btc_price": 71250.0,
+  "copper_inventories": 185.0,
+  "uranium_spot": 95.5,
+  "semi_equipment_orders": 18.5,
+  "hyperscaler_capex_signal": 8.2,
+  "cyber_incidents": 75.0,
+  "china_pmi": 50.8,
+  "electricity_demand_signal": 4.1,
+  "equities": {
+    "NVDA": {
+      "price": 850.0
+    },
+    "AMD": {
+      "price": 180.0
+    },
+    "TSM": {
+      "price": 140.0
+    },
+    "ASML": {
+      "price": 950.0
+    },
+    "MSFT": {
+      "price": 420.0
+    },
+    "AMZN": {
+      "price": 175.0
+    },
+    "GOOGL": {
+      "price": 145.0
+    },
+    "META": {
+      "price": 500.0
+    }
+  },
+  "macro": {
+    "SPY": {
+      "price": 662.29
+    },
+    "VIX": {
+      "value": 18.7
+    },
+    "DXY": {
+      "value": 104.25
+    },
+    "Gold": {
+      "price": 2185.5
+    }
+  },
+  "crypto": {
+    "BTC": {
+      "price": 71250.0
+    }
+  },
+  "timestamp": "2026-03-14T05:52:47.759355+00:00"
+}

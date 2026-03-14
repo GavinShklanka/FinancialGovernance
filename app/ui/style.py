@@ -826,19 +826,17 @@ def page_hero(
             f'<span class="lumin-chip accent">{_safe(chip)}</span>' for chip in chips
         )
 
-    st.markdown(
-        f"""
-        <section class="lumin-hero">
-            <div class="lumin-orb a"></div>
-            <div class="lumin-orb b"></div>
-            <div class="lumin-kicker">{_safe(kicker)}</div>
-            <div class="lumin-title">{_safe(title)}</div>
-            <div class="lumin-subtitle">{_safe(subtitle)}</div>
-            <div class="lumin-chip-row">{chips_html}</div>
-        </section>
-        """,
-        unsafe_allow_html=True,
+    html = (
+        f'<section class="lumin-hero">'
+        f'<div class="lumin-orb a"></div>'
+        f'<div class="lumin-orb b"></div>'
+        f'<div class="lumin-kicker">{_safe(kicker)}</div>'
+        f'<div class="lumin-title">{_safe(title)}</div>'
+        f'<div class="lumin-subtitle">{_safe(subtitle)}</div>'
+        f'<div class="lumin-chip-row">{chips_html}</div>'
+        f'</section>'
     )
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def section_divider(label: str) -> None:
@@ -847,15 +845,13 @@ def section_divider(label: str) -> None:
 
 def analyst_note(title: str, body: str, tone: str = "accent") -> None:
     tone = tone if tone in {"accent", "success", "warning", "danger"} else "accent"
-    st.markdown(
-        f"""
-        <div class="lumin-note {tone}">
-            <div class="lumin-note__title">{_safe(title)}</div>
-            <div class="lumin-note__body">{_safe(body)}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    html = (
+        f'<div class="lumin-note {tone}">'
+        f'<div class="lumin-note__title">{_safe(title)}</div>'
+        f'<div class="lumin-note__body">{_safe(body)}</div>'
+        f'</div>'
     )
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def card_grid(cards: Sequence[Mapping[str, str]], columns: int = 3) -> None:
@@ -869,23 +865,22 @@ def card_grid(cards: Sequence[Mapping[str, str]], columns: int = 3) -> None:
         footer = _safe(card.get("footer", ""))
         icon = _safe(card.get("icon", "✦"))
 
+        eyebrow_html = f'<div class="lumin-card__eyebrow">{eyebrow}</div>' if eyebrow else ""
+        footer_html = f'<div class="lumin-card__footer">{footer}</div>' if footer else ""
+
         items.append(
-            f"""
-            <article class="lumin-card">
-                <div class="lumin-card__top">
-                    <div style="flex: 1 1 auto;">
-                        {'<div class="lumin-card__eyebrow">' + eyebrow + '</div>' if eyebrow else ''}
-                        <div class="lumin-card__title">{title}</div>
-                    </div>
-                    <div class="lumin-card__icon">{icon}</div>
-                </div>
-                <div class="lumin-card__body">{body}</div>
-                {'<div class="lumin-card__footer">' + footer + '</div>' if footer else ''}
-            </article>
-            """
+            f'<article class="lumin-card">'
+            f'<div class="lumin-card__top">'
+            f'<div style="flex:1 1 auto;">'
+            f'{eyebrow_html}'
+            f'<div class="lumin-card__title">{title}</div>'
+            f'</div>'
+            f'<div class="lumin-card__icon">{icon}</div>'
+            f'</div>'
+            f'<div class="lumin-card__body">{body}</div>'
+            f'{footer_html}'
+            f'</article>'
         )
 
-    st.markdown(
-        f'<section class="lumin-grid {col_class}">{"".join(items)}</section>',
-        unsafe_allow_html=True,
-    )
+    html = f'<section class="lumin-grid {col_class}">{"".join(items)}</section>'
+    st.markdown(html, unsafe_allow_html=True)

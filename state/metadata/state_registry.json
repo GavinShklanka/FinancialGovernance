@@ -10,6 +10,17 @@
         "defensive_regime"
       ],
       "portfolio_stance": "bearish"
+    },
+    {
+      "date": "2026_03_14",
+      "signal_score": 4.7,
+      "regimes": [
+        "ai_infrastructure_boom",
+        "commodity_supercycle",
+        "liquidity_contraction",
+        "defensive_regime"
+      ],
+      "portfolio_stance": "bearish"
     }
   ]
 }
